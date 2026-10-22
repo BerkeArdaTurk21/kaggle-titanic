@@ -1,8 +1,10 @@
 model,cv_mean,cv_std,train_mean,train_cv_gap
 Majority class,0.6162,0.0023,0.6162,-0.0
 Gender rule,0.7868,0.0188,0.7868,0.0
-Logistic regression,0.8305,0.0099,0.8339,0.0034
 Random forest (default),0.8215,0.0188,0.9888,0.1673
 XGBoost (default),0.8215,0.0356,0.975,0.1535
 Random forest (tuned),0.8305,0.0128,0.8945,0.064
+Logistic regression,0.8305,0.0099,0.8339,0.0034
+Logistic regression + group,0.8406,0.0162,0.924,0.0833
 XGBoost (tuned),0.8316,0.0248,0.8864,0.0548
+XGBoost (tuned) + group,0.8373,0.0073,0.9231,0.0859

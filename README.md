@@ -13,7 +13,7 @@ predict which passengers survived the sinking (binary classification, scored by 
 | 1. Exploratory data analysis | done | `notebooks/01_eda.ipynb` |
 | 2. Baseline (logistic regression) | done | `notebooks/02_baseline.ipynb` |
 | 3. Tree models (Random Forest, XGBoost) | done | `notebooks/03_trees.ipynb` |
-| 4. Cross-validation and model selection | planned | |
+| 4. New feature: group survival (leak-free) | done | `notebooks/04_group_features.ipynb` |
 | 5. Kaggle submission | done | `submissions/` |
 
 ## Results
@@ -32,8 +32,16 @@ cross-validation, so the reported score is not inflated by the search.
 | XGBoost (default) | 0.822 ± 0.036 | 0.975 | |
 | Random forest (tuned) | 0.831 ± 0.013 | 0.895 | |
 | XGBoost (tuned) | 0.832 ± 0.025 | 0.886 | 0.77033 |
+| Logistic regression + group survival | 0.841 ± 0.016 | (inflated) | |
+| XGBoost (tuned) + group survival | 0.837 ± 0.007 | (inflated) | |
 
 ![Model comparison](reports/figures/model_comparison.png)
+
+The group survival feature is the survival rate of the *other* known passengers sharing a ticket or family.
+It is built from the target, so it is fitted inside the Pipeline with leave-one-out on the training rows.
+Train accuracy for these models includes each passenger's own label and is not comparable.
+
+![Leaky vs honest evaluation](reports/figures/group_feature_comparison.png)
 
 ## Key findings so far
 
@@ -48,6 +56,10 @@ cross-validation, so the reported score is not inflated by the search.
   between them is one or two passengers, well within the noise, so it does not change the conclusion that
   they are equally good. The drop from CV to the leaderboard is the more useful signal: the CV estimate is
   optimistic for this test set.
+- New information moves the plateau: the group survival feature lifts logistic regression to 0.841 and is never
+  worse on any fold. It mostly helps women in 3rd class whose family perished (accuracy 65% → 74%).
+- Leakage demo: computing the same feature carelessly gives 0.983 (own label included) or 0.844 (computed before
+  CV). The second is only 0.3 points above the honest score, which is exactly why it would go unnoticed.
 
 ![Random forest depth curve](reports/figures/rf_depth_curve.png)
 

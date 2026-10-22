@@ -2,7 +2,7 @@
 
 Two kinds of steps live here:
 - `add_features` is stateless: each row is transformed on its own, nothing is learned from the data.
-- `TitleAgeImputer` learns statistics (median age per title) in `fit`, so it must sit inside a
+- `TitleAgeImputer` and `GroupSurvivalEncoder` learn from the data in `fit`, so they must sit inside a
   scikit-learn Pipeline to be fitted on the training folds only.
 """
 import numpy as np
@@ -54,20 +54,77 @@ class TitleAgeImputer(BaseEstimator, TransformerMixin):
         return out
 
 
-def make_preprocessor():
-    """Full preprocessing: engineered features -> age imputation -> scaling and one-hot encoding."""
+def group_keys(X):
+    """Ticket and family (surname + fare) keys used to find passengers travelling together."""
+    surname = X["Name"].str.split(",").str[0].str.strip()
+    family = surname + "_" + X["Fare"].round(2).astype(str)
+    return X["Ticket"].astype(str).to_numpy(), family.to_numpy()
+
+
+class GroupSurvivalEncoder(BaseEstimator, TransformerMixin):
+    """Survival rate of the *other* known passengers sharing a ticket or a family (surname + fare).
+
+    Adds `GroupSurvival` (rate, `default` when no other member's label is known) and `GroupKnown` (0/1).
+    The feature is built from training labels, so it leaks unless two rules hold:
+    - it is fitted inside the Pipeline, on the training folds only;
+    - on the training rows each passenger's own label is left out (leave-one-out), otherwise the feature
+      contains the answer. Like scikit-learn's TargetEncoder, `fit_transform` therefore differs from
+      `fit(...).transform(...)`: only `transform` (used for new passengers) sees all stored labels.
+    """
+
+    def __init__(self, default=0.5):
+        self.default = default
+
+    def fit(self, X, y):
+        self.tickets_, self.families_ = group_keys(X)
+        self.labels_ = np.asarray(y, dtype=float)
+        return self
+
+    def transform(self, X):
+        return self._encode(X, leave_one_out=False)
+
+    def fit_transform(self, X, y):
+        return self.fit(X, y)._encode(X, leave_one_out=True)
+
+    def _encode(self, X, leave_one_out):
+        tickets, families = group_keys(X)
+        rates = np.full(len(X), self.default)
+        known = np.zeros(len(X), dtype=int)
+        for i, (ticket, family) in enumerate(zip(tickets, families)):
+            members = (self.tickets_ == ticket) | (self.families_ == family)
+            if leave_one_out:
+                members[i] = False  # row i of X is training row i: drop the passenger's own label
+            if members.any():
+                rates[i] = self.labels_[members].mean()
+                known[i] = 1
+        out = X.copy()
+        out["GroupSurvival"] = rates
+        out["GroupKnown"] = known
+        return out
+
+
+def make_preprocessor(group_survival=False):
+    """Full preprocessing: engineered features -> age imputation -> scaling and one-hot encoding.
+
+    With `group_survival=True` the `GroupSurvivalEncoder` step is added and its two columns are used.
+    """
+    numeric = NUMERIC_FEATURES + (["GroupSurvival"] if group_survival else [])
+    binary = BINARY_FEATURES + (["GroupKnown"] if group_survival else [])
     columns = ColumnTransformer(
         [
-            ("numeric", make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), NUMERIC_FEATURES),
-            ("binary", "passthrough", BINARY_FEATURES),
+            ("numeric", make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), numeric),
+            ("binary", "passthrough", binary),
             ("categorical",
              make_pipeline(SimpleImputer(strategy="most_frequent"), OneHotEncoder(handle_unknown="ignore")),
              CATEGORICAL_FEATURES),
         ],
         verbose_feature_names_out=False,
     )
-    return Pipeline([
+    steps = [
         ("engineer", FunctionTransformer(add_features)),
         ("impute_age", TitleAgeImputer()),
-        ("columns", columns),
-    ])
+    ]
+    if group_survival:
+        steps.append(("group_survival", GroupSurvivalEncoder()))
+    steps.append(("columns", columns))
+    return Pipeline(steps)
