@@ -11,6 +11,8 @@ predict which passengers survived the sinking (binary classification, scored by 
 What moved the score was new information (how the passenger's travel group fared), computed so that no
 label leaks into the evaluation.
 
+**Write-up:** [What My First Kaggle Project Taught Me About Data Leakage and Simple Models](https://medium.com/@berkeardaturk/what-my-first-kaggle-project-taught-me-about-data-leakage-and-simple-models-c7c2b174e6f2) (Medium)
+
 ## Notebooks
 
 Run them in order; each one ends with a *Findings* section.
