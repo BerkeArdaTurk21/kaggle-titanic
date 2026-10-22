@@ -8,4 +8,5 @@ xgboost==3.4.1
 ipykernel==7.4.0
 nbformat==5.11.1
 nbconvert==7.17.2
+shap==0.52.0
 kaggle==2.2.4

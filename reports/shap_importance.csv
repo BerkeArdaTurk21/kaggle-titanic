@@ -1,0 +1,12 @@
+feature,mean_abs_shap
+Title,0.6884
+Gender,0.6732
+Pclass,0.3481
+GroupSurvival,0.3302
+LogFare,0.2596
+Age,0.2339
+HasCabin,0.1989
+Embarked,0.1158
+FamilyType,0.1119
+AgeMissing,0.0318
+GroupKnown,0.0181

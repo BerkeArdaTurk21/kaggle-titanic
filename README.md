@@ -21,6 +21,7 @@ Run them in order; each one ends with a *Findings* section.
 | [`02_baseline.ipynb`](notebooks/02_baseline.ipynb) | Majority class, gender rule and logistic regression with a shared 5-fold CV and a leak-free `Pipeline`; error analysis |
 | [`03_trees.ipynb`](notebooks/03_trees.ipynb) | Random Forest and XGBoost, default vs tuned with nested CV, depth curve, permutation importance |
 | [`04_group_features.ipynb`](notebooks/04_group_features.ipynb) | Group survival feature: two leaky versions vs the honest one, effect on both models, test coverage check |
+| [`05_shap.ipynb`](notebooks/05_shap.ipynb) | SHAP explanations of the XGBoost + group model on held-out folds: global ranking, group feature by gender, one passenger step by step |
 
 ## Results
 
