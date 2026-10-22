@@ -1,0 +1,4 @@
+model,cv_mean,cv_std,train_mean,train_cv_gap
+Majority class,0.6162,0.0023,0.6162,-0.0
+Gender rule,0.7868,0.0188,0.7868,0.0
+Logistic regression,0.8305,0.0099,0.8339,0.0034
