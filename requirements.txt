@@ -1,0 +1,11 @@
+# Python 3.12
+pandas==3.0.6
+numpy==2.5.4
+matplotlib==3.11.2
+seaborn==0.13.2
+scikit-learn==1.9.1
+xgboost==3.4.1
+ipykernel==7.4.0
+nbformat==5.11.1
+nbconvert==7.17.2
+kaggle==2.2.4

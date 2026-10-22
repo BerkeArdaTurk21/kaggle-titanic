@@ -1,0 +1,15 @@
+# Environment
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Data (download from Kaggle, never commit)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Secrets
+kaggle.json
+access_token
+.env
