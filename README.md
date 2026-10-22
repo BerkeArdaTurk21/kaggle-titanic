@@ -68,8 +68,14 @@ training rows. Train accuracy for these models includes each passenger's own lab
   often than the validation folds (41% vs 37%), which fits a larger gain there.
 - Leakage demo: computing the same feature carelessly gives 0.983 (own label included) or 0.844 (computed before
   CV). The second is only 0.3 points above the honest score, which is exactly why it would go unnoticed.
+- SHAP on held-out folds (XGBoost + group): title and gender share the top spot (0.69 and 0.67 mean |SHAP|,
+  log-odds), followed by class and group survival. When all known group members died, the feature lowers a woman's
+  log-odds by 1.27 on average. Men whose group survived are close to a coin flip: boys survive 93%, adult men 30%,
+  and the feature cannot tell which adult men did.
 
 ![Random forest depth curve](reports/figures/rf_depth_curve.png)
+
+![SHAP beeswarm](reports/figures/shap_beeswarm.png)
 
 ## Limitations
 
