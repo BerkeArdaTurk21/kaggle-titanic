@@ -12,7 +12,7 @@ predict which passengers survived the sinking (binary classification, scored by 
 |---|---|---|
 | 1. Exploratory data analysis | done | `notebooks/01_eda.ipynb` |
 | 2. Baseline (logistic regression) | done | `notebooks/02_baseline.ipynb` |
-| 3. Tree models (Random Forest, XGBoost) | planned | |
+| 3. Tree models (Random Forest, XGBoost) | done | `notebooks/03_trees.ipynb` |
 | 4. Cross-validation and model selection | planned | |
 | 5. Kaggle submission | planned | `submissions/` |
 
@@ -20,22 +20,32 @@ predict which passengers survived the sinking (binary classification, scored by 
 
 5-fold stratified cross-validation on the 891 training passengers, the same folds for every model.
 All learned preprocessing (age imputation by title, scaling, one-hot encoding) runs inside a scikit-learn
-`Pipeline`, so it is fitted on the training folds only.
+`Pipeline`, so it is fitted on the training folds only. Tree model hyperparameters are tuned with nested
+cross-validation, so the reported score is not inflated by the search.
 
-| Model | CV accuracy (mean ± std) | Kaggle public score |
-|---|---|---|
-| Majority class ("everyone died") | 0.616 ± 0.002 | |
-| Gender rule ("women survived") | 0.787 ± 0.019 | |
-| Logistic regression | 0.831 ± 0.010 | |
+| Model | CV accuracy (mean ± std) | Train accuracy | Kaggle public score |
+|---|---|---|---|
+| Majority class ("everyone died") | 0.616 ± 0.002 | 0.616 | |
+| Gender rule ("women survived") | 0.787 ± 0.019 | 0.787 | |
+| Logistic regression | 0.831 ± 0.010 | 0.834 | |
+| Random forest (default) | 0.822 ± 0.019 | 0.989 | |
+| XGBoost (default) | 0.822 ± 0.036 | 0.975 | |
+| Random forest (tuned) | 0.831 ± 0.013 | 0.895 | |
+| XGBoost (tuned) | 0.832 ± 0.025 | 0.886 | |
 
-![Baseline comparison](reports/figures/baseline_comparison.png)
+![Model comparison](reports/figures/model_comparison.png)
 
 ## Key findings so far
 
 - Gender, ticket class and the title in the passenger's name are the strongest signals.
 - Logistic regression beats the gender rule on every fold, with no sign of overfitting (train 0.834).
-- It struggles with women in 3rd class and men in 1st class, where the effect of gender depends on class.
-  Tree models, which learn such interactions, are the next step.
+- Tree ensembles with default settings memorise the training data (train 0.98–0.99) and score lower on new
+  passengers. Tuned, they tie with logistic regression: fold-by-fold differences go both ways and are smaller
+  than the fold-to-fold noise.
+- Trees did not fix the groups logistic regression gets wrong (women in 3rd class, men in 1st class). With these
+  features ~83% looks like a ceiling; further gains need new information, not a more flexible model.
+
+![Random forest depth curve](reports/figures/rf_depth_curve.png)
 
 ## Project structure
 
