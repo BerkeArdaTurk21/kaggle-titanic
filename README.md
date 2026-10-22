@@ -111,3 +111,8 @@ Download the data from the
 (you need to join the competition first) and put `train.csv` and `test.csv` into `data/raw/`.
 Then open the notebooks in order with the `Python (kaggle-titanic)` kernel.
 Notebooks 03 and 04 run nested cross-validation and take a few minutes each on a laptop CPU.
+
+## License
+
+Code is released under the [MIT License](LICENSE). The Titanic data belongs to Kaggle and is not included;
+download it from the competition page.
