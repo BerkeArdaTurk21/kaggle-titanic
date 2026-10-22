@@ -32,8 +32,8 @@ cross-validation, so the reported score is not inflated by the search.
 | XGBoost (default) | 0.822 ± 0.036 | 0.975 | |
 | Random forest (tuned) | 0.831 ± 0.013 | 0.895 | |
 | XGBoost (tuned) | 0.832 ± 0.025 | 0.886 | 0.77033 |
-| Logistic regression + group survival | 0.841 ± 0.016 | (inflated) | |
-| XGBoost (tuned) + group survival | 0.837 ± 0.007 | (inflated) | |
+| Logistic regression + group survival | 0.841 ± 0.016 | (inflated) | **0.79425** |
+| XGBoost (tuned) + group survival | 0.837 ± 0.007 | (inflated) | 0.78947 |
 
 ![Model comparison](reports/figures/model_comparison.png)
 
@@ -58,6 +58,9 @@ Train accuracy for these models includes each passenger's own label and is not c
   optimistic for this test set.
 - New information moves the plateau: the group survival feature lifts logistic regression to 0.841 and is never
   worse on any fold. It mostly helps women in 3rd class whose family perished (accuracy 65% → 74%).
+  On Kaggle the gain is larger than in CV: logistic regression goes from 0.766 to 0.794 (+2.9 points, about
+  12 test passengers) and XGBoost from 0.770 to 0.789. The test set has known group members slightly more
+  often than the validation folds (41% vs 37%), which fits a larger gain there.
 - Leakage demo: computing the same feature carelessly gives 0.983 (own label included) or 0.844 (computed before
   CV). The second is only 0.3 points above the honest score, which is exactly why it would go unnoticed.
 
