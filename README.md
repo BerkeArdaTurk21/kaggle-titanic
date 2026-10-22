@@ -14,7 +14,7 @@ predict which passengers survived the sinking (binary classification, scored by 
 | 2. Baseline (logistic regression) | done | `notebooks/02_baseline.ipynb` |
 | 3. Tree models (Random Forest, XGBoost) | done | `notebooks/03_trees.ipynb` |
 | 4. Cross-validation and model selection | planned | |
-| 5. Kaggle submission | planned | `submissions/` |
+| 5. Kaggle submission | done | `submissions/` |
 
 ## Results
 
@@ -27,11 +27,11 @@ cross-validation, so the reported score is not inflated by the search.
 |---|---|---|---|
 | Majority class ("everyone died") | 0.616 ± 0.002 | 0.616 | |
 | Gender rule ("women survived") | 0.787 ± 0.019 | 0.787 | |
-| Logistic regression | 0.831 ± 0.010 | 0.834 | |
+| Logistic regression | 0.831 ± 0.010 | 0.834 | 0.76555 |
 | Random forest (default) | 0.822 ± 0.019 | 0.989 | |
 | XGBoost (default) | 0.822 ± 0.036 | 0.975 | |
 | Random forest (tuned) | 0.831 ± 0.013 | 0.895 | |
-| XGBoost (tuned) | 0.832 ± 0.025 | 0.886 | |
+| XGBoost (tuned) | 0.832 ± 0.025 | 0.886 | 0.77033 |
 
 ![Model comparison](reports/figures/model_comparison.png)
 
@@ -44,6 +44,10 @@ cross-validation, so the reported score is not inflated by the search.
   than the fold-to-fold noise.
 - Trees did not fix the groups logistic regression gets wrong (women in 3rd class, men in 1st class). With these
   features ~83% looks like a ceiling; further gains need new information, not a more flexible model.
+- On Kaggle both models score about 6 points below their CV accuracy (0.766 and 0.770). The 0.5-point gap
+  between them is one or two passengers, well within the noise, so it does not change the conclusion that
+  they are equally good. The drop from CV to the leaderboard is the more useful signal: the CV estimate is
+  optimistic for this test set.
 
 ![Random forest depth curve](reports/figures/rf_depth_curve.png)
 
