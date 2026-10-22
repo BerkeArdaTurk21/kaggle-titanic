@@ -42,6 +42,9 @@ nested cross-validation, so the reported score is not inflated by the search.
 | **Logistic regression + group survival** | **0.841 ± 0.016** | (inflated) | **0.79425** |
 | XGBoost (tuned) + group survival | 0.837 ± 0.007 | (inflated) | 0.78947 |
 
+The ± value is the standard deviation of the five fold scores (`numpy.std`, ddof=0). It shows how much a score
+moves from fold to fold; it is not a confidence interval, because the folds share most of their training data.
+
 ![Model comparison](reports/figures/model_comparison.png)
 
 The group survival feature is the survival rate of the *other* known passengers sharing a ticket or family
@@ -86,6 +89,21 @@ training rows. Train accuracy for these models includes each passenger's own lab
 - The group survival feature relies on passengers travelling together appearing in both train and test, which is
   specific to this dataset.
 
+## Model card
+
+| | |
+|---|---|
+| **Model** | Logistic regression in a scikit-learn `Pipeline` with the group survival feature (`make_preprocessor(group_survival=True)` in `src/titanic/features.py`) |
+| **Task** | Predict whether a Titanic passenger survived (binary classification) |
+| **Intended use** | A learning project and Kaggle competition entry. Not meant for decisions about real people. |
+| **Training data** | Kaggle Titanic `train.csv`: 891 passengers, 38% survived. Not included in this repository. |
+| **Inputs** | Age (imputed by title), log fare, missing-age and has-cabin flags, ticket class, gender, title, family type, port of embarkation, group survival rate and whether the group is known |
+| **Evaluation** | Accuracy on 5-fold stratified CV (`StratifiedKFold(5, shuffle=True, random_state=42)`), the same folds for every model, plus the Kaggle public leaderboard |
+| **Performance** | CV 0.841 ± 0.016 (fold std); Kaggle public 0.79425 |
+| **Where it fails** | The groups the baseline already got wrong: women in 3rd class (accuracy 65% → 74% with the group feature) and men in 1st class |
+| **Limitations** | See [Limitations](#limitations). The group feature only helps when a passenger's travel companions are in the data. |
+| **Ethical note** | The data records who survived in 1912, when gender and ticket class decided much of the outcome. The model learns these historical patterns; they say nothing about people today. |
+
 ## Project structure
 
 ```
@@ -101,7 +119,9 @@ kaggle-titanic/
 │   ├── data.py         # load_raw: reads the CSVs, renames Sex -> Gender
 │   └── features.py     # feature engineering, TitleAgeImputer, GroupSurvivalEncoder, make_preprocessor
 ├── submissions/        # CSV files sent to Kaggle
-└── requirements.txt
+├── requirements.txt    # direct dependencies, pinned
+├── requirements.lock   # every installed package, pinned (pip freeze on Windows, Python 3.12)
+└── .python-version     # 3.12
 ```
 
 ## How to run
@@ -109,7 +129,7 @@ kaggle-titanic/
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # Windows; on macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.lock   # exact versions behind the results; requirements.txt has only the direct ones
 python -m ipykernel install --user --name kaggle-titanic --display-name "Python (kaggle-titanic)"
 ```
 
